@@ -3,6 +3,8 @@ var sendBtn = document.getElementById("sendBtn");
 var msgs = document.getElementById("msgs");
 var sendFileBtn = document.getElementById("sendFileBtn");
 var files = document.getElementById("files");
+var error = document.getElementById("error");
+
 var rtc = SkyRTC();
 let head = window.location.href.substring(window.location.protocol.length).split('#')[0];
 let parameter = window.location.hash.slice(1);
@@ -121,9 +123,9 @@ rtc.on("stream_created", function (stream) {
 //创建本地视频流失败
 rtc.on("stream_create_error", function (err) {
     if (err && err.name == "NotFoundError"){
-        alert("未发现摄像头或麦克风");
+        error.innerText = "未发现摄像头或麦克风！"
     }else{
-        alert("创建连接异常，请联系管理员！");
+        error.innerText = "创建连接错误："+err.message;
     }
 });
 //接收到其他用户的视频流

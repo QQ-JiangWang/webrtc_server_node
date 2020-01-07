@@ -6,6 +6,7 @@ const SkyRTC = function () {
     let getUserMedia;
     let nativeRTCIceCandidate;
     let nativeRTCSessionDescription;
+    let error = document.getElementById("error");
     try{
         PeerConnection = (window.PeerConnection || window.webkitPeerConnection00 || window.webkitRTCPeerConnection ||
             window.mozRTCPeerConnection);
@@ -18,7 +19,7 @@ const SkyRTC = function () {
         nativeRTCIceCandidate = (window.mozRTCIceCandidate || window.RTCIceCandidate);
         nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription);
     }catch (e) {
-        alert("获取getUserMedia异常："+e)
+        error.innerHTML = "getUserMedia错误："+e.message;
     }
 
     const iceServer = {

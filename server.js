@@ -1,20 +1,41 @@
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
-const bodyParser = require('body-parser');
+const log4js = require('log4js');
+//const bodyParser = require('body-parser');
 const path = require("path");
 const SkyRTC = require('./public/dist/js/SkyRTC.js').listen(server);
 const port = process.env.PORT || 3000;
 const hostname = "0.0.0.0";
-const ejs = require('ejs');
+//const ejs = require('ejs');
+log4js.configure({
+    appenders: {
+        file: {
+            type: 'file',
+            filename: 'app.log',
+            layout: {
+                type: 'pattern',
+                pattern: '%r %p - %m',
+            }
+        }
+    },
+    categories: {
+        default: {
+            appenders: ['file'],
+            level: 'debug'
+        }
+    }
+});
 
+var logger = log4js.getLogger();
 app.use(express.static(path.join(__dirname, 'public')), null);
 
 
 server.listen(port, hostname, function () {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
-app.engine('ejs',ejs.renderFile);
+
+/*app.engine('ejs',ejs.renderFile);
 app.set('views', __dirname + '/views'); // general config
 app.set('view engine', 'html');
 app.use(bodyParser.json());
@@ -23,11 +44,11 @@ app.post('/index', function (req, res) {
     debugger
     res.sendfile(__dirname + '/index.html');
 
-});
+});*/
 app.get('/', function (req, res) {
     console.log(req)
-    //res.sendfile(__dirname + '/index.html');
-    res.render('index', {title: 'home', username: 'test', team: 'test'});
+    res.sendfile(__dirname + '/index.html');
+    //res.render('index', {title: 'home', username: 'test', team: 'test'});
 });
 
 
@@ -61,4 +82,5 @@ SkyRTC.rtc.on('answer', function (socket, answer) {
 
 SkyRTC.rtc.on('error', function (error) {
     console.log("发生错误：" + error.message);
+    logger.error("发生错误：" + error.message);
 });
