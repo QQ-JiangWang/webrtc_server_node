@@ -46,7 +46,7 @@ app.post('/index', function (req, res) {
 
 });*/
 app.get('/', function (req, res) {
-    console.log(req)
+
     res.sendfile(__dirname + '/index.html');
     //res.render('index', {title: 'home', username: 'test', team: 'test'});
 });
