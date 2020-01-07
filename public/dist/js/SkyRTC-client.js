@@ -20,6 +20,7 @@ const SkyRTC = function () {
         nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription);
     }catch (e) {
         error.innerHTML = "getUserMedia错误："+e.message;
+        return
     }
 
     const iceServer = {
@@ -108,7 +109,13 @@ const SkyRTC = function () {
         var socket,
             that = this;
         room = room || "";
-        socket = this.socket = new WebSocket(server);
+        try{
+            socket = this.socket = new WebSocket(server);
+        }catch (e) {
+            error.innerHTML = e.message;
+            return
+        }
+
         socket.onopen = function () {
             socket.send(JSON.stringify({
                 "eventName": "__join",
@@ -362,7 +369,14 @@ const SkyRTC = function () {
     //创建单个PeerConnection
     skyrtc.prototype.createPeerConnection = function (socketId) {
         var that = this;
-        var pc = new PeerConnection(iceServer);
+        var pc;
+        try{
+            pc = new PeerConnection(iceServer);
+        }catch (e) {
+            error.innerHTML = e.message;
+            return
+        }
+
         this.peerConnections[socketId] = pc;
         pc.onicecandidate = function (evt) {
             if (evt.candidate)
