@@ -2,18 +2,24 @@ const SkyRTC = function () {
 
     //创建本地流
     let gThat;
-    let PeerConnection = (window.PeerConnection || window.webkitPeerConnection00 || window.webkitRTCPeerConnection ||
-        window.mozRTCPeerConnection);
-    let getUserMedia = (navigator.getUserMedia ||//旧版API
-        navigator.mediaDevices.getUserMedia ||//最新的标准API
-        navigator.webkitGetUserMedia ||  //webkit核心浏览器
-        navigator.mozGetUserMedia ||     //firfox浏览器
-        navigator.msGetUserMedia
-    );
-
-    let nativeRTCIceCandidate = (window.mozRTCIceCandidate || window.RTCIceCandidate);
-    let nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription);
-
+    let PeerConnection;
+    let getUserMedia;
+    let nativeRTCIceCandidate;
+    let nativeRTCSessionDescription;
+    try{
+        PeerConnection = (window.PeerConnection || window.webkitPeerConnection00 || window.webkitRTCPeerConnection ||
+            window.mozRTCPeerConnection);
+        getUserMedia = (navigator.getUserMedia ||//旧版API
+            navigator.mediaDevices.getUserMedia ||//最新的标准API
+            navigator.webkitGetUserMedia ||  //webkit核心浏览器
+            navigator.mozGetUserMedia ||     //firfox浏览器
+            navigator.msGetUserMedia
+        );
+        nativeRTCIceCandidate = (window.mozRTCIceCandidate || window.RTCIceCandidate);
+        nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription);
+    }catch (e) {
+        alert("获取getUserMedia异常："+e)
+    }
 
     const iceServer = {
         "iceServers": [
@@ -214,7 +220,7 @@ const SkyRTC = function () {
             navigator.mediaDevices.getUserMedia(constraints).then(success).catch(error);
         } else if (navigator.webkitGetUserMedia) {
             //webkit核心浏览器
-            navigator.webkitGetUserMedia(constraints, success, error)
+            navigator.webkitGetUserMedia(constraints, success, error);
         } else if (navigator.mozGetUserMedia) {
             //firfox浏览器
             navigator.mozGetUserMedia(constraints, success, error);

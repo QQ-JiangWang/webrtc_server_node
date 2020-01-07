@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
+const bodyParser = require('body-parser');
 const path = require("path");
 const SkyRTC = require('./public/dist/js/SkyRTC.js').listen(server);
 const port = process.env.PORT || 3000;
 const hostname = "0.0.0.0";
+const ejs = require('ejs');
 
 app.use(express.static(path.join(__dirname, 'public')), null);
 
@@ -12,11 +14,22 @@ app.use(express.static(path.join(__dirname, 'public')), null);
 server.listen(port, hostname, function () {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
-
-
-app.get('/', function (req, res) {
+app.engine('ejs',ejs.renderFile);
+app.set('views', __dirname + '/views'); // general config
+app.set('view engine', 'html');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }))
+app.post('/index', function (req, res) {
+    debugger
     res.sendfile(__dirname + '/index.html');
+
 });
+app.get('/', function (req, res) {
+    console.log(req)
+    //res.sendfile(__dirname + '/index.html');
+    res.render('index', {title: 'home', username: 'test', team: 'test'});
+});
+
 
 SkyRTC.rtc.on('new_connect', function (socket) {
     console.log('创建新连接');

@@ -4,7 +4,27 @@ var msgs = document.getElementById("msgs");
 var sendFileBtn = document.getElementById("sendFileBtn");
 var files = document.getElementById("files");
 var rtc = SkyRTC();
-
+let head = window.location.href.substring(window.location.protocol.length).split('#')[0];
+let parameter = window.location.hash.slice(1);
+let room = null;
+let video = false;
+let audio = false;
+if (parameter){
+    var pars = parameter.split("&");
+    debugger
+    pars.forEach((value, index, arr)=>{
+        var name = value.split("=");
+        if (name && name.length == 2){
+            if (name[0] == "room") {
+                room = name[1];
+            } else if (name[0] == "video"){
+                video = name[1];
+            } else if (name[0] == "audio"){
+                audio = name[1];
+            }
+        }
+    }, this);
+}
 /**********************************************************/
 sendBtn.onclick = function (event) {
     var msgIpt = document.getElementById("msgIpt"),
@@ -87,8 +107,8 @@ rtc.on('receive_file_ask', function (sendId, socketId, fileName, fileSize) {
 rtc.on("connected", function (socket) {
     //创建本地视频流
     rtc.createStream({
-        "video": true,
-        "audio": true
+        "video": video,
+        "audio": audio
     });
 });
 //创建本地视频流成功
@@ -99,8 +119,12 @@ rtc.on("stream_created", function (stream) {
     document.getElementById('me').volume = 0.0;
 });
 //创建本地视频流失败
-rtc.on("stream_create_error", function () {
-    alert("create stream failed!");
+rtc.on("stream_create_error", function (err) {
+    if (err && err.name == "NotFoundError"){
+        alert("未发现摄像头或麦克风");
+    }else{
+        alert("创建连接异常，请联系管理员！");
+    }
 });
 //接收到其他用户的视频流
 rtc.on('pc_add_stream', function (stream, socketId) {
@@ -126,4 +150,5 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
     msgs.appendChild(p);
 });
 //连接WebSocket服务器
-rtc.connect("wss:" + window.location.href.substring(window.location.protocol.length).split('#')[0]+"/wss", window.location.hash.slice(1));
+
+rtc.connect("ws:" + head, room);
