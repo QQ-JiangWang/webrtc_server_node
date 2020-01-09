@@ -10,11 +10,13 @@ const SkyRTC = function () {
     try{
         PeerConnection = (window.PeerConnection || window.webkitPeerConnection00 || window.webkitRTCPeerConnection ||
             window.mozRTCPeerConnection);
-        getUserMedia = (navigator.getUserMedia ||//旧版API
+        getUserMedia = (navigator.getUserMedia || //旧版API
+            MediaDevices.getUserMedia ||
             (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) ||//最新的标准API
             navigator.webkitGetUserMedia ||  //webkit核心浏览器
             navigator.mozGetUserMedia ||     //firfox浏览器
             navigator.msGetUserMedia
+
         );
         nativeRTCIceCandidate = (window.mozRTCIceCandidate || window.RTCIceCandidate);
         nativeRTCSessionDescription = (window.mozRTCSessionDescription || window.RTCSessionDescription);
