@@ -151,5 +151,5 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
 });
 //连接WebSocket服务器
 
-rtc.connect("ws:" + head, room);
-//rtc.connect("wss:" + head+"/wss", room);
+//rtc.connect("ws:" + head, room,user);
+rtc.connect("wss:" + head+"/wss", room,user);
