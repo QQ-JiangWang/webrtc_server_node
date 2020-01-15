@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>really peer connection</title>
+    <link rel="stylesheet" href="/dist/css/main.css">
+    <script type="text/javascript" src="/dist/js/jquery.js"></script>
+    <script language="javascript" type="text/javascript">
+        function gotoNextPage(){
+            var video = document.querySelector('input#video').checked;
+            var audio = document.querySelector('input#audio').checked;
+            $.ajax({
+                type: "POST",
+                url: '/webrtcJoinRoom',
+                contentType: "application/json",
+                data:JSON.stringify({
+                    "par": "cOEDizww3DB6bws2a7KR9c2novBArZZnJsTu9GBY6glVdtd4g2thMWGPIRBJkGuR5ObMWJZyiUbU4dtQ++eOVDvI7ldmuP87cBOi84qAR9KYrWXsXWPe5S/cmiggmYS/lFNX3crQNkLmwRjwURcgxg==",
+                }),
+                success: function (result) {
+                    console.log("data is :" + result)
+                    if (result.code == 200) {
+
+                    }else {
+                        alert(result.message)
+                    }
+                }
+            });
+        }
+    </script>
+
+</head>
+<body>
+<table align="center">
+    <tr><td><div>
+        <label>视频:</label>
+        <input type="checkbox" id="video" checked>
+        <label>音频:</label>
+        <input type="checkbox" id="audio" checked>
+    </div></td></tr>
+    <tr><td><div>
+        <button id="join" onclick="gotoNextPage()">Join</button>
+    </div></td></tr>
+</table>
+</body>
+</html>

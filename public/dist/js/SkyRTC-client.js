@@ -79,6 +79,8 @@ const SkyRTC = function () {
         this.localMediaStream = null;
         //所在房间
         this.room = "";
+        //所在用户id
+        this.userid = null;
         //接收文件时用于暂存接收文件
         this.fileData = {};
         //本地WebSocket连接
@@ -107,10 +109,11 @@ const SkyRTC = function () {
 
     /*************************服务器连接部分***************************/
 
-    skyrtc.prototype.connect = function (server, room) {
+    skyrtc.prototype.connect = function (server, room,userid) {
         var socket,
             that = this;
         room = room || "";
+        userid = userid;
         try{
             socket = this.socket = new WebSocket(server);
         }catch (e) {
@@ -122,7 +125,8 @@ const SkyRTC = function () {
             socket.send(JSON.stringify({
                 "eventName": "__join",
                 "data": {
-                    "room": room
+                    "room": room,
+                    "userid":userid
                 }
             }));
             that.emit("socket_opened", socket);
@@ -179,7 +183,12 @@ const SkyRTC = function () {
             var pc = that.createPeerConnection(data.socketId),
                 i, m;
             pc.addStream(that.localMediaStream);
-            that.emit('new_peer', data.socketId);
+            var dataInfo = {
+                sockeitId:data.socketId,
+                room: that.room,
+                userId: that.userid
+            };
+            that.emit('new_peer', dataInfo);
         });
 
         this.on('_remove_peer', function (data) {
@@ -192,7 +201,12 @@ const SkyRTC = function () {
                     data.socketId][sendId].file);
             }
             delete that.fileChannels[data.socketId];
-            that.emit("remove_peer", data.socketId);
+            var dataInfo = {
+                sockeitId:data.socketId,
+                room: that.room,
+                userId: that.userid
+            };
+            that.emit("remove_peer", dataInfo);
         });
 
         this.on('_offer', function (data) {

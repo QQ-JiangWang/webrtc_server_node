@@ -1,34 +1,29 @@
 var videos = document.getElementById("videos");
-var sendBtn = document.getElementById("sendBtn");
-var msgs = document.getElementById("msgs");
-var sendFileBtn = document.getElementById("sendFileBtn");
-var files = document.getElementById("files");
-var error = document.getElementById("error");
+//var sendBtn = document.getElementById("sendBtn");
+var error = document.getElementById("msgs");
+//var sendFileBtn = document.getElementById("sendFileBtn");
+//var files = document.getElementById("files");
 
 var rtc = SkyRTC();
-let head = window.location.href.substring(window.location.protocol.length).split('#')[0];
-let parameter = window.location.hash.slice(1);
+let head = window.location.href.substring(window.location.protocol.length).split('?')[0];
+let parameter = videos.getAttribute("data");
+console.log(parameter);
 let room = null;
 let video = false;
 let audio = false;
+let user = null;
 if (parameter){
-    var pars = parameter.split("&");
-    debugger
-    pars.forEach((value, index, arr)=>{
-        var name = value.split("=");
-        if (name && name.length == 2){
-            if (name[0] == "room") {
-                room = name[1];
-            } else if (name[0] == "video"){
-                video = name[1];
-            } else if (name[0] == "audio"){
-                audio = name[1];
-            }
-        }
-    }, this);
+    var pars = JSON.parse(parameter);
+    if (pars){
+        video = pars.video;
+        audio = pars.audio;
+        room = pars.room;
+        user = pars.user;
+    }
+
 }
 /**********************************************************/
-sendBtn.onclick = function (event) {
+/*sendBtn.onclick = function (event) {
     var msgIpt = document.getElementById("msgIpt"),
         msg = msgIpt.value,
         p = document.createElement("p");
@@ -42,10 +37,10 @@ sendBtn.onclick = function (event) {
 sendFileBtn.onclick = function (event) {
     //分享文件
     rtc.shareFile("fileIpt");
-};
+};*/
 /**********************************************************/
 
-
+/*********************************** 发送文件逻辑********************************/
 //对方同意接收文件
 rtc.on("send_file_accepted", function (sendId, socketId, file) {
     var p = document.getElementById("sf-" + sendId);
@@ -105,6 +100,9 @@ rtc.on('receive_file_ask', function (sendId, socketId, fileName, fileSize) {
         rtc.sendFileRefuse(sendId);
     }
 });
+
+
+/*********************************** 创建音视频连接********************************/
 //成功创建WebSocket连接
 rtc.on("connected", function (socket) {
     //创建本地视频流
@@ -153,4 +151,5 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
 });
 //连接WebSocket服务器
 
-rtc.connect("wss:" + head+"/wss", room);
+rtc.connect("ws:" + head, room);
+//rtc.connect("wss:" + head+"/wss", room);

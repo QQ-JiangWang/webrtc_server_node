@@ -8,18 +8,16 @@
 <body>
 <div id="chat">
     <div class="msgs" id="msgs"></div>
-    <input type="file" id="fileIpt" class="fileIpt">
+    <!--<input type="file" id="fileIpt" class="fileIpt">
     <button id="sendFileBtn" class="sendFileBtn">发送文件</button>
     <input type="text" id="msgIpt" class="msgIpt" title="消息">
-    <button id="sendBtn" class="sendBtn">发送</button>
+    <button id="sendBtn" class="sendBtn">发送</button>-->
 </div>
-<div id="videos">
+<div id="videos" data="<%=data%>">
     <video id="me" autoplay></video>
 </div>
 <div id="files">
-</div>
-<div id="error" style="background-color: rebeccapurple">
-
+    <%=data%>
 </div>
 <script type="text/javascript" src="/dist/js/SkyRTC-client.js"></script>
 <script type="text/javascript" src="/dist/js/conn.js"></script>

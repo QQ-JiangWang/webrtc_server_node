@@ -2,18 +2,20 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const log4js = require('log4js');
-//const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const path = require("path");
+const ejs = require('ejs');
 const SkyRTC = require('./public/dist/js/SkyRTC.js').listen(server);
-const ecb = require('./public/dist/js/aes-ecb.js');
+const ecb = require('./utils/aes-ecb.js');
+
+const dbUtil = require('./utils/databaseConnect.js');
 const port = process.env.PORT || 3000;
 const hostname = "0.0.0.0";
-const rooms = new Map();
 const UUID = require('node-uuid');
 const key = new Buffer("c4b84456c1379bec99c4d1b7e9f13173", 'hex');
-const key256 = new Buffer("c4b84456c1379bec99c4d1b7e9f13173c4b84456c1379bec99c4d1b7e9f13173", 'hex')
+//const key256 = new Buffer("c4b84456c1379bec99c4d1b7e9f13173c4b84456c1379bec99c4d1b7e9f13173", 'hex')
 
-//const ejs = require('ejs');
+//日志存储
 log4js.configure({
     appenders: {
         file: {
@@ -33,68 +35,140 @@ log4js.configure({
     }
 });
 
+const logger = log4js.getLogger();
 
 
 
-var logger = log4js.getLogger();
 app.use(express.static(path.join(__dirname, 'public')), null);
-
 
 server.listen(port, hostname, function () {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-/*app.engine('ejs',ejs.renderFile);
-app.set('views', __dirname + '/views'); // general config
-app.set('view engine', 'html');
+app.engine('.html',ejs.renderFile);
+/*app.set('views', __dirname + '/views'); // general config
+app.set('view engine', 'html');*/
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
-app.post('/index', function (req, res) {
-    debugger
-    res.sendfile(__dirname + '/index.html');
-
-});*/
-app.get('/', function (req, res) {
+//加入房间
+app.get('/webrtcJoinRoom', async function (req, res) {
     var str = req.query.par;
-    var crypto_buffer =ecb.decText(str,key);
-    var str1 = crypto_buffer.toString();
-    console.log(str1);
-    //localStorage.setItem('room', str);
-    res.sendfile(__dirname + '/index.html');
+    console.log(req.query.par)
+    if (!str){
+        res.json({code:'1',msg:"未传递参数！"});
+        return;
+    }
+    //str = str.replace(/\s*/g,"");
+    var pars;
+    try{
+        var crypto_buffer =ecb.decText(str,key);
+        var str1 = crypto_buffer.toString();
+        pars = JSON.parse(str1);
+    }catch (e) {
+        res.json({code: "2", msg: e.message});
+        return
+    }
+    try{
+        if (pars) {
+            var addSql = 'select * from webrtc_roomlist where token = ? and id = ?';
+            var addSqlParams = [];
+            addSqlParams.push(pars.token);
+            addSqlParams.push(pars.room);
+            var result = await dbUtil.query(addSql,addSqlParams);
+            if (!result){
+                res.json({code: "3", msg: "房间不存在或验证失败！"});
+                return;
+            }
+            addSql = 'select * from webrtc_roomuser where userid = ? and roomid = ?';
+            addSqlParams = [];
+            addSqlParams.push(pars.user);
+            addSqlParams.push(pars.room);
+            logger.info("用户加入房间",addSqlParams)
+            var roomUserResult = await dbUtil.query(addSql,addSqlParams);
+            if (!roomUserResult || roomUserResult.length == 0){
+                res.json({code: "4", msg: "该用户不属于这个房间"});
+                return;
+            }
+            if (roomUserResult.length > 1) {
+                res.json({code: "6", msg: "该用户重复存在这个房间"});
+                return;
+            }
+            if (roomUserResult[0].status == 1){
+                res.json({code: "7", msg: "该用户已加入这个房间"});
+                return;
+            }
+            //dbUtil.updateRoomUserStatus(roomUserResult[0].id);
+            var data = {
+                room : pars.room,
+                video : pars.video,
+                audio : pars.audio,
+                user : pars.user
+            };
+
+            res.render("index.html", {data: JSON.stringify(data)});
+        }
+    }catch (e) {
+        res.json({code: "5", msg: e.message});
+    }
+
+    //res.sendfile(__dirname + '/views/index.html');
 
 });
+
 //创建房间
-app.get('/webrtcCreateRoom', function (req, res) {
-    var room = 1;
-    var uuid = UUID.v4();
-    var result = null;
-    while(true){
-        if (!rooms.get(room)){
-            result = {
-                room:room,
-                token:uuid
-            }
-            rooms.set(room,uuid);
-            break;
-        }
-        room++;
+app.post('/webrtcCreateRoom', async function (req, res) {
+    var users = req.body.users;
+    if (!users){
+        res.json({code:'1',msg:'未传用户信息'});
+        return;
     }
-    res.json(result);
+    try{
+        var token = UUID.v4();
+        var addSql = 'INSERT INTO webrtc_roomlist(token) VALUES(?)';
+        var addSqlParams = [];
+        addSqlParams.push(token);
+        var result = await dbUtil.query(addSql,addSqlParams);
+        if (result && result.insertId){
+            dbUtil.createRoomUser(result.insertId,users);
+            res.json({code:'0',result:{room:result.insertId,token:token}});
+        } else{
+            res.json({code:'2',msg:'创建房间失败'});
+        }
+    }catch (e) {
+        res.json({code:'3',msg:e.message});
+    }
 });
+
+app.get('/login', function (req, res) {
+    res.sendfile(__dirname + '/views/login.html');
+})
 
 SkyRTC.rtc.on('new_connect', function (socket) {
     console.log('创建新连接');
     logger.info("创建新连接");
 });
 
-SkyRTC.rtc.on('remove_peer', function (socketId) {
-    console.log(socketId + "用户离开");
-    logger.info(socketId + "用户离开");
+SkyRTC.rtc.on('remove_peer',async function (data) {
+    console.log(data);
+    var flag = await dbUtil.deleteRoomUser(data);
+    if (!flag){
+        logger.info("新用户" + data.socketId + "加入房间" + data.room+"失败");
+        logger.info(data.socketId + "用户离开房间"+data.room+"成功");
+    } else{
+        logger.info("新用户" + data.socketId + "加入房间" + data.room);
+        logger.info(data.socketId + "用户离开房间"+data.room +"失败");
+    }
+
 });
 
-SkyRTC.rtc.on('new_peer', function (socket, room) {
-    console.log("新用户" + socket.id + "加入房间" + room);
-    logger.info("新用户" + socket.id + "加入房间" + room);
+SkyRTC.rtc.on('new_peer', async function (data) {
+    console.log(data);
+    var flag = await dbUtil.updateRoomUserStatus(data);
+    if (!flag){
+        logger.info("新用户" + data.socketId + "加入房间" + data.room+"失败");
+    } else{
+        logger.info("新用户" + data.socketId + "加入房间" + data.room);
+    }
 });
 
 SkyRTC.rtc.on('socket_message', function (socket, msg) {
