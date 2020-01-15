@@ -126,7 +126,7 @@ const SkyRTC = function () {
                 "eventName": "__join",
                 "data": {
                     "room": room,
-                    "userid":userid
+                    "userId":userid
                 }
             }));
             that.emit("socket_opened", socket);
@@ -183,12 +183,7 @@ const SkyRTC = function () {
             var pc = that.createPeerConnection(data.socketId),
                 i, m;
             pc.addStream(that.localMediaStream);
-            var dataInfo = {
-                sockeitId:data.socketId,
-                room: that.room,
-                userId: that.userid
-            };
-            that.emit('new_peer', dataInfo);
+            that.emit('new_peer', data.socketId);
         });
 
         this.on('_remove_peer', function (data) {
@@ -201,12 +196,7 @@ const SkyRTC = function () {
                     data.socketId][sendId].file);
             }
             delete that.fileChannels[data.socketId];
-            var dataInfo = {
-                sockeitId:data.socketId,
-                room: that.room,
-                userId: that.userid
-            };
-            that.emit("remove_peer", dataInfo);
+            that.emit("remove_peer", data.socketId);
         });
 
         this.on('_offer', function (data) {

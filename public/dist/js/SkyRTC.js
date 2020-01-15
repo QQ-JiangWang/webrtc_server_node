@@ -18,11 +18,11 @@ function SkyRTC() {
     this.on('__join', function (data, socket) {
 
         console.log("房间里有" + this.sockets.length + "人");
-
         let ids = [],
             i, m,
             room = data.room || "__default",
             curSocket,
+            userId = data.userId,
             curRoom;
 
         curRoom = this.rooms[room] = this.rooms[room] || [];
@@ -43,7 +43,7 @@ function SkyRTC() {
 
         curRoom.push(socket);
         socket.room = room;
-
+        socket.userId = userId;
         socket.send(JSON.stringify({
             "eventName": "_peers",
             "data": {
@@ -205,7 +205,7 @@ SkyRTC.prototype.init = function (socket) {
         }
 
         that.removeSocket(socket);
-        that.emit('remove_peer', socket.id, that);
+        that.emit('remove_peer', socket.id, room,that);
     });
     that.emit('new_connect', socket);
 };

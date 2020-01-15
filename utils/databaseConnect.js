@@ -60,8 +60,8 @@ function updateRoomUserStatus(data) {
     }
     var addSql = 'UPDATE webrtc_roomuser SET status = 1,soketid = ? WHERE userid = ? and roomid = ?';
     var addSqlParams = [];
-    addSqlParams.push(data.sockeitId);
-    addSqlParams.push(data.userid);
+    addSqlParams.push(data.socketId);
+    addSqlParams.push(data.userId);
     addSqlParams.push(data.room);
     pool.getConnection(function(err,connect){//通过getConnection()方法进行数据库连接
         if(err){
@@ -81,15 +81,14 @@ function updateRoomUserStatus(data) {
 
 }
 //删除房间用户
-function deleteRoomUser(data) {
-    if (!data){
+function deleteRoomUser(socket,room) {
+    if (!socket || !room){
         return false;
     }
-    var addSql = 'delete from webrtc_roomuser  WHERE userid = ? and roomid = ? and soketid = ?';
+    var addSql = 'delete from webrtc_roomuser  WHERE  roomid = ? and soketid = ?';
     var addSqlParams = [];
-    addSqlParams.push(data.userid);
-    addSqlParams.push(data.room);
-    addSqlParams.push(data.sockeitId);
+    addSqlParams.push(room);
+    addSqlParams.push(socket);
     pool.getConnection(function(err,connect){//通过getConnection()方法进行数据库连接
         if(err){
             //logger.error('[CREATE CONNECTION] - ',err.message);

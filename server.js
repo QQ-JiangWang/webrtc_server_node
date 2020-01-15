@@ -143,14 +143,17 @@ app.get('/login', function (req, res) {
     res.sendfile(__dirname + '/views/login.html');
 })
 
-SkyRTC.rtc.on('new_connect', function (socket) {
+SkyRTC.rtc.on('new_connect', async function (socket) {
     console.log('创建新连接');
+    //var flag = await dbUtil.deleteRoomUser(data);
     logger.info("创建新连接");
 });
 
-SkyRTC.rtc.on('remove_peer',async function (data) {
-    console.log(data);
-    var flag = await dbUtil.deleteRoomUser(data);
+SkyRTC.rtc.on('remove_peer',async function (socket,room,that) {
+    console.log("remove_peer socket:"+socket);
+    console.log("remove_peer room:"+room);
+    console.log("remove_peer this:"+that);
+    var flag = await dbUtil.deleteRoomUser(socket,room);
     if (!flag){
         logger.info("新用户" + data.socketId + "加入房间" + data.room+"失败");
         logger.info(data.socketId + "用户离开房间"+data.room+"成功");
@@ -162,12 +165,17 @@ SkyRTC.rtc.on('remove_peer',async function (data) {
 });
 
 SkyRTC.rtc.on('new_peer', async function (data) {
-    console.log(data);
-    var flag = await dbUtil.updateRoomUserStatus(data);
+    var datas = {
+        room:data.room,
+        userId:data.userId,
+        socketId:data.id
+    }
+    var flag = await dbUtil.updateRoomUserStatus(datas);
+    console.log("updateRoomUserStatus:"+flag)
     if (!flag){
-        logger.info("新用户" + data.socketId + "加入房间" + data.room+"失败");
+        logger.info("新用户" + data.id + "加入房间" + data.room+"失败");
     } else{
-        logger.info("新用户" + data.socketId + "加入房间" + data.room);
+        logger.info("新用户" + data.id + "加入房间" + data.room);
     }
 });
 
