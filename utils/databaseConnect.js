@@ -8,25 +8,19 @@ var pool = mysql.createPool({
     password : '1120454016Jw',
     database : 'webrtc'
 });
-console.log("获取数据库连接池")
+
 function query( sql, values ) {
     // 返回一个 Promise
-    console.log("query--连接数据库")
     var promise = new Promise(( resolve, reject ) => {
-        console.log("获取数据库单独连接")
         pool.getConnection(function(err,connect){//通过getConnection()方法进行数据库连接
             if(err){
-                console.log("数据库错误：")
-                console.log(err)
+
             }else{
-                console.log("数据库成功")
                 connect.query(sql, values, ( err, rows) => {
                     if ( err ) {
-                        console.log("数据库错误：")
-                        console.log(err)
                         reject( err )
                     } else {
-                        console.log("数据库成功")
+
                         resolve( rows )
                     }
                     connect.release();//释放连接池中的数据库连接
