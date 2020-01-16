@@ -118,8 +118,6 @@ app.post('/webrtcJoinRoom', async function (req, res) {
 //创建房间
 app.post('/webrtcCreateRoom', async function (req, res) {
     var users = req.body.users;
-    var video = req.body.video;
-    var audio = req.body.audio;
     if (!users){
         res.json({code:'1',msg:'未传用户信息'});
         return;
@@ -133,10 +131,7 @@ app.post('/webrtcCreateRoom', async function (req, res) {
         var result = await dbUtil.query(addSql,addSqlParams);
         if (result && result.insertId){
             dbUtil.createRoomUser(result.insertId,users);
-            var data = JSON.stringify({room:result.insertId,token:token,video:video,audio:audio,user:users[0]})
-            console.log("加入房间参数："+data)
-            var text_encrypt = ecb.encText(data,key);
-            res.json({code:'200',result:{room:result.insertId,token:token,par:text_encrypt}});
+            res.json({code:'200',result:{room:result.insertId,token:token}});
         } else{
             res.json({code:'2',msg:'创建房间失败'});
         }
@@ -144,11 +139,24 @@ app.post('/webrtcCreateRoom', async function (req, res) {
         res.json({code:'3',msg:e.message});
     }
 });
+app.post('/webrtcCreateUserCode', function (req, res) {
+    var user = req.body.user;
+    var video = req.body.video;
+    var audio = req.body.audio;
+    var room = req.body.room;
+    var token = req.body.token;
+    var data = JSON.stringify({room:room,token:token,video:video,audio:audio,user:user})
+    console.log("加入房间人参数："+data)
+    var text_encrypt = ecb.encText(data,key);
+    res.json({code:'200',result:text_encrypt});
+});
 
-app.get('/login', function (req, res) {
+app.get('/webrtcLogin', function (req, res) {
     res.sendfile(__dirname + '/views/login.html');
 })
-
+app.get('/createRoom', function (req, res) {
+    res.sendfile(__dirname + '/views/createRoom.html');
+})
 SkyRTC.rtc.on('new_connect', async function (socket) {
     console.log('创建新连接');
     logger.info("创建新连接");
