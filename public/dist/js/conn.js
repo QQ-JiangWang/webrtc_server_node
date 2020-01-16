@@ -5,7 +5,7 @@ var error = document.getElementById("msgs");
 //var files = document.getElementById("files");
 
 var rtc = SkyRTC();
-let head = window.location.href.substring(window.location.protocol.length).split('?')[0];
+let head = window.location.href.substring(window.location.protocol.length).split('?')[0].replace("webrtcJoinRoom","");
 let parameter = videos.getAttribute("data");
 console.log(parameter);
 let room = null;
