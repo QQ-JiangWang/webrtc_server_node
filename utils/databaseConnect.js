@@ -13,7 +13,8 @@ function query( sql, values ) {
     var promise = new Promise(( resolve, reject ) => {
         pool.getConnection(function(err,connect){//通过getConnection()方法进行数据库连接
             if(err){
-                //logger.error('[CREATE CONNECTION] - ',err.message);
+                console.log("数据库错误：")
+                console.log(err)
             }else{
                 connect.query(sql, values, ( err, rows) => {
                     if ( err ) {
