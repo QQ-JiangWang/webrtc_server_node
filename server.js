@@ -53,7 +53,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 //加入房间
 app.post('/webrtcJoinRoom', async function (req, res) {
     var str = req.body.par;
-    console.log(req.body);
     if (!str){
         res.json({code:'1',msg:"未传递参数！"});
         return;
@@ -104,7 +103,7 @@ app.post('/webrtcJoinRoom', async function (req, res) {
                 audio : pars.audio,
                 user : pars.user
             };
-
+            console.log("转发页面参数："+JSON.stringify(data));
             res.render("index.html", {data: JSON.stringify(data)});
         }
     }catch (e) {
