@@ -57,12 +57,14 @@ app.post('/webrtcJoinRoom', async function (req, res) {
         res.json({code:'1',msg:"未传递参数！"});
         return;
     }
+    console.log("参数："+str);
     //str = str.replace(/\s*/g,"");
     var pars;
     try{
         var crypto_buffer =ecb.decText(str,key);
         var str1 = crypto_buffer.toString();
         pars = JSON.parse(str1);
+        console.log("解析参数："+pars);
     }catch (e) {
         res.json({code: "2", msg: e.message});
         return
@@ -73,6 +75,7 @@ app.post('/webrtcJoinRoom', async function (req, res) {
             var addSqlParams = [];
             addSqlParams.push(pars.token);
             addSqlParams.push(pars.room);
+
             var result = await dbUtil.query(addSql,addSqlParams);
             if (!result){
                 res.json({code: "3", msg: "房间不存在或验证失败！"});
