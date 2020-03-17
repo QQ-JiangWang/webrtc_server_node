@@ -8,6 +8,7 @@ var pool = mysql.createPool({
     password : '123456',
     database : 'webrtc'
 });
+
 function query( sql, values ) {
     // 返回一个 Promise
     var promise = new Promise(( resolve, reject ) => {
@@ -15,11 +16,13 @@ function query( sql, values ) {
             if(err){
                 //logger.error('[CREATE CONNECTION] - ',err.message);
                 console.log(err.message);
+
             }else{
                 connect.query(sql, values, ( err, rows) => {
                     if ( err ) {
                         reject( err )
                     } else {
+
                         resolve( rows )
                     }
                     connect.release();//释放连接池中的数据库连接

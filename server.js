@@ -53,17 +53,18 @@ app.use(bodyParser.urlencoded({ extended: false }))
 //加入房间
 app.post('/webrtcJoinRoom', async function (req, res) {
     var str = req.body.par;
-    console.log(req.body);
     if (!str){
         res.json({code:'1',msg:"未传递参数！"});
         return;
     }
+    console.log("参数："+str);
     //str = str.replace(/\s*/g,"");
     var pars;
     try{
         var crypto_buffer =ecb.decText(str,key);
         var str1 = crypto_buffer.toString();
         pars = JSON.parse(str1);
+        console.log(pars);
     }catch (e) {
         res.json({code: "2", msg: e.message});
         return
@@ -75,6 +76,7 @@ app.post('/webrtcJoinRoom', async function (req, res) {
             addSqlParams.push(pars.token);
             addSqlParams.push(pars.room);
             var result = await dbUtil.query(addSql,addSqlParams);
+            console.log(result);
             if (!result){
                 res.json({code: "3", msg: "房间不存在或验证失败！"});
                 return;
@@ -104,7 +106,7 @@ app.post('/webrtcJoinRoom', async function (req, res) {
                 audio : pars.audio,
                 user : pars.user
             };
-
+            console.log("转发页面参数："+JSON.stringify(data));
             res.render("index.html", {data: JSON.stringify(data)});
         }
     }catch (e) {
