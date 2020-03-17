@@ -128,12 +128,15 @@ rtc.on("stream_create_error", function (err) {
 });
 //接收到其他用户的视频流
 rtc.on('pc_add_stream', function (stream, socketId) {
-    var newVideo = document.createElement("video");
     var id = "other-" + socketId;
-    newVideo.setAttribute("class", "other");
-    newVideo.setAttribute("autoplay", "autoplay");
-    newVideo.setAttribute("id", id);
-    videos.appendChild(newVideo);
+    var otherVideo = document.getElementById(id);
+    if (!otherVideo){
+        var newVideo = document.createElement("video");
+        newVideo.setAttribute("class", "other");
+        newVideo.setAttribute("autoplay", "autoplay");
+        newVideo.setAttribute("id", id);
+        videos.appendChild(newVideo);
+    }
     rtc.attachStream(stream, id);
 });
 //删除其他用户
@@ -154,13 +157,6 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
 //rtc.connect("ws:" + head, room,user);
 rtc.connect("wss:" + head+"/wss", room,user);
 function refresh(){
-    var video = document.getElementsByClassName("other");
-    if (video){
-        var videos = document.getElementById("videos");
-        for(var i=0;i<video.length;i++){
-            videos.removeChild(video[i]);
-        }
-    }
     rtc.refresh();
 }
 
