@@ -3,9 +3,9 @@
 var mysql    = require('mysql');
 //创建连接池
 var pool = mysql.createPool({
-    host     : 'rm-wz91b4j0bsa4ui8n5vo.mysql.rds.aliyuncs.com',
+    host     : '47.97.68.127',
     user     : 'root',
-    password : '1120454016Jw',
+    password : '123456',
     database : 'webrtc'
 });
 function query( sql, values ) {
@@ -14,6 +14,7 @@ function query( sql, values ) {
         pool.getConnection(function(err,connect){//通过getConnection()方法进行数据库连接
             if(err){
                 //logger.error('[CREATE CONNECTION] - ',err.message);
+                console.log(err.message);
             }else{
                 connect.query(sql, values, ( err, rows) => {
                     if ( err ) {

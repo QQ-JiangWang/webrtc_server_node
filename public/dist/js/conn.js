@@ -5,7 +5,7 @@ var error = document.getElementById("msgs");
 //var files = document.getElementById("files");
 
 var rtc = SkyRTC();
-let head = window.location.href.substring(window.location.protocol.length).split('?')[0];
+let head = window.location.href.substring(window.location.protocol.length).split('?')[0].replace("webrtcJoinRoom","");
 let parameter = videos.getAttribute("data");
 console.log(parameter);
 let room = null;
@@ -151,5 +151,15 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
 });
 //连接WebSocket服务器
 
-rtc.connect("ws:" + head, room,user);
-//rtc.connect("wss:" + head+"/wss", room,user);
+//rtc.connect("ws:" + head, room,user);
+rtc.connect("wss:" + head+"/wss", room,user);
+function refresh(){
+    var video = document.getElementsByClassName("other");
+    if (video){
+        var videos = document.getElementById("videos");
+        for(var i=0;i<video.length;i++){
+            videos.removeChild(video[i]);
+        }
+    }
+    rtc.refresh();
+}
