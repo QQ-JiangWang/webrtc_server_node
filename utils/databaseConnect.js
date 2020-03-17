@@ -3,9 +3,9 @@
 var mysql    = require('mysql');
 //创建连接池
 var pool = mysql.createPool({
-    host     : 'rm-wz91b4j0bsa4ui8n5vo.mysql.rds.aliyuncs.com',
+    host     : '47.97.68.127',
     user     : 'root',
-    password : '1120454016Jw',
+    password : '123456',
     database : 'webrtc'
 });
 
