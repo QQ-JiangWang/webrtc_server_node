@@ -14,6 +14,8 @@ function query( sql, values ) {
     var promise = new Promise(( resolve, reject ) => {
         pool.getConnection(function(err,connect){//通过getConnection()方法进行数据库连接
             if(err){
+                //logger.error('[CREATE CONNECTION] - ',err.message);
+                console.log(err.message);
 
             }else{
                 connect.query(sql, values, ( err, rows) => {

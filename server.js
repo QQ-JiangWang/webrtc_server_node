@@ -131,6 +131,7 @@ app.post('/webrtcCreateRoom', async function (req, res) {
         var addSqlParams = [];
         addSqlParams.push(token);
         var result = await dbUtil.query(addSql,addSqlParams);
+        console.log(result);
         if (result && result.insertId){
             dbUtil.createRoomUser(result.insertId,users);
             res.json({code:'200',result:{room:result.insertId,token:token}});

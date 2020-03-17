@@ -108,7 +108,12 @@ const SkyRTC = function () {
 
 
     /*************************服务器连接部分***************************/
-
+    //刷新方法
+    skyrtc.prototype.refresh = function () {
+        if (gThat) {
+            gThat.emit("ready");
+        }
+    }
     skyrtc.prototype.connect = function (server, room,userid) {
         var socket,
             that = this;
