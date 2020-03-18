@@ -134,6 +134,7 @@ rtc.on('pc_add_stream', function (stream, socketId) {
         var newVideo = document.createElement("video");
         newVideo.setAttribute("class", "other");
         newVideo.setAttribute("autoplay", "autoplay");
+        newVideo.setAttribute("playsinline", "playsinline");
         newVideo.setAttribute("id", id);
         videos.appendChild(newVideo);
     }
