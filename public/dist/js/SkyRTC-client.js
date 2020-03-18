@@ -296,7 +296,15 @@ const SkyRTC = function () {
         } else {
             element.src = webkitURL.createObjectURL(stream);
         }
-        element.play();
+        //判断是否在播放
+        var isPlaying = element.currentTime > 0 && !element.paused && !element.ended
+            && element.readyState > 2;
+
+        if (!isPlaying) {
+            element.play();
+        }
+        //element.play();
+
     };
 
 

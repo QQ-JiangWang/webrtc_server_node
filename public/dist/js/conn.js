@@ -158,8 +158,14 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
 rtc.connect("wss:" + head+"/wss", room,user);
 
 function refresh() {
-    //rtc.refresh(room,rtc.connections[0]);
-    rtc.emit("ready");
+    var flag = false;
+    if (flag){
+        rtc.refresh(room,rtc.connections[0]);
+
+    } else{
+
+        rtc.emit("ready");
+    }
 }
 
 
