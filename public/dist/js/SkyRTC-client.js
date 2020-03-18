@@ -108,12 +108,7 @@ const SkyRTC = function () {
 
 
     /*************************服务器连接部分***************************/
-    //刷新方法
-    skyrtc.prototype.refresh = function () {
-        if (gThat) {
-            gThat.emit("ready");
-        }
-    }
+
     skyrtc.prototype.connect = function (server, room,userid) {
         var socket,
             that = this;
@@ -358,7 +353,18 @@ const SkyRTC = function () {
             console.log(error);
         });
     };
-
+    //刷新方法
+    skyrtc.prototype.refresh = function (room,socketid) {
+        if (this){
+            this.socket.send(JSON.stringify({
+                "eventName": "__refresh",
+                "data": {
+                    "room": room,
+                    "socketId":socketid
+                }
+            }));
+        }
+    }
     //接收到answer类型信令后将对方的session描述写入PeerConnection中
     skyrtc.prototype.receiveAnswer = function (socketId, sdp) {
         var pc = this.peerConnections[socketId];

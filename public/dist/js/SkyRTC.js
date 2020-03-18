@@ -111,6 +111,24 @@ function SkyRTC() {
     this.on('__ack', function (data) {
 
     });
+    // 房间所有人刷新连接
+    this.on('__refresh', function (data) {
+        console.log("服务器接收到刷新，" + data.room + "房间，"+data.socketId);
+        let ids = [],
+            i, m,
+            room = data.room || "__default",
+            curSocket,
+            curRoom;
+
+        curRoom = this.rooms[room] = this.rooms[room] || [];
+
+        for (i = 0, m = curRoom.length; i < m; i++) {
+            curSocket = curRoom[i];
+            curSocket.send(JSON.stringify({
+                "eventName": "ready",
+            }), errorCb);
+        }
+    });
 }
 
 util.inherits(SkyRTC, events.EventEmitter);
@@ -207,6 +225,7 @@ SkyRTC.prototype.init = function (socket) {
         that.removeSocket(socket);
         that.emit('remove_peer', socket.id, room,that);
     });
+
     that.emit('new_connect', socket);
 };
 
