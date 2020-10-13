@@ -67,9 +67,6 @@ function updateRoomUserStatus(data) {
     addSqlParams.push(data.socketId);
     addSqlParams.push(data.userId);
     addSqlParams.push(data.room);
-    
-    console.log("用户进入房间："+data.room+";"+data.userId);
-    
     pool.getConnection(function(err,connect){//通过getConnection()方法进行数据库连接
         if(err){
             //logger.error('[CREATE CONNECTION] - ',err.message);

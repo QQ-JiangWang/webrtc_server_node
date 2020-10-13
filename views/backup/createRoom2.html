@@ -6,11 +6,7 @@
 <link rel="stylesheet" href="/dist/css/main.css">
 <script type="text/javascript" src="/dist/js/jquery.js"></script>
 <script language="javascript" type="text/javascript">
-        function createRoom(e){
-        	
-        	var evt= window.event||arguments.callee.caller.arguments[0];
-        	var evnode=evt.srcElement ? evt.srcElement : evt.target;
-        	
+        function createRoom(){
             let userid = $("#userid").val();
             if (!userid){
                 alert("用户id未传！");
@@ -27,29 +23,13 @@
                 success: function (result) {
                     if (result.code == 200) {
                         $("#room").val(result.result.room);
-                        $("#_vtn").val(result.result.token);
+                        $("#token").val(result.result.token);
                     }else {
                         alert(result.msg == null ? result.message:result.msg);
                     }
-                    
-                    evnode.nextElementSibling.disabled=false;
-                    evnode.disabled=true;
-                    
                 }
             });
         }
-        
-        function joinRoom(){
-        	var utext=$('#userid').val();
-        	var u=utext.split(",")[0];
-        	var r=$('#room').val();
-        	var v=$('#_vtn').val();
-        	
-        	window.location.href = "webrtcLogin?u="+u+"&r="+r+"&v="+v;  	
-        }
-        
-
-        
     </script>
 
 <style>
@@ -83,17 +63,14 @@ input {
 		</tr>
 		<tr>
 			<td style="color: gray">房间验证码</td>
-			<td><input class="editable" type="text" id="_vtn" readonly></td>
+			<td><input class="editable" type="text" id="token" readonly></td>
 		</tr>
 
 		<tr>
 			<td colspan="2" style="height: 50px; text-align: center; margin-top: 30px;">
-				<input type="button" onclick="createRoom()" value="创建房间" style="height: 30px; width: 230px;">
-				<input disabled="disabled"  type="button" onclick="joinRoom()" value="开始进入" style="height: 30px; width: 230px;">
+				<input type="button" onclick="createRoom()" value="创建房间" style="height: 30px; width: 470px;">
 			</td>
 		</tr>
-		
-		
 
 	</table>
 </body>

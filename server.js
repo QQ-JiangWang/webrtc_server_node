@@ -15,6 +15,9 @@ const UUID = require('node-uuid');
 const key = new Buffer("c4b84456c1379bec99c4d1b7e9f13173", 'hex');
 //const key256 = new Buffer("c4b84456c1379bec99c4d1b7e9f13173c4b84456c1379bec99c4d1b7e9f13173", 'hex')
 
+//关闭node https://www.cnblogs.com/ZQWelcomeIndex/p/11447409.html
+
+
 //日志存储
 log4js.configure({
     appenders: {
@@ -46,8 +49,6 @@ server.listen(port, hostname, function () {
 });
 
 app.engine('.html',ejs.renderFile);
-/*app.set('views', __dirname + '/views'); // general config
-app.set('view engine', 'html');*/
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 //加入房间
@@ -57,8 +58,7 @@ app.post('/webrtcJoinRoom', async function (req, res) {
         res.json({code:'1',msg:"未传递参数！"});
         return;
     }
-    console.log("参数："+str);
-    //str = str.replace(/\s*/g,"");
+    console.log("加入房间："+str);
     var pars;
     try{
         var crypto_buffer =ecb.decText(str,key);
@@ -99,7 +99,6 @@ app.post('/webrtcJoinRoom', async function (req, res) {
                 res.json({code: "7", msg: "该用户已加入这个房间"});
                 return;
             }
-            //dbUtil.updateRoomUserStatus(roomUserResult[0].id);
             var data = {
                 room : pars.room,
                 video : pars.video,
@@ -113,18 +112,20 @@ app.post('/webrtcJoinRoom', async function (req, res) {
         res.json({code: "5", msg: e.message});
     }
 
-    //res.sendfile(__dirname + '/views/index.html');
 
 });
 
 //创建房间
 app.post('/webrtcCreateRoom', async function (req, res) {
+	 
     var users = req.body.users;
     if (!users){
         res.json({code:'1',msg:'未传用户信息'});
         return;
     }
-
+    
+    console.log("创建房间:"+users);
+    
     try{
         var token = UUID.v4();
         var addSql = 'INSERT INTO webrtc_roomlist(token) VALUES(?)';
@@ -166,8 +167,7 @@ SkyRTC.rtc.on('new_connect', async function (socket) {
 });
 
 SkyRTC.rtc.on('remove_peer',async function (socket,room,that) {
-    console.log("remove_peer socket:"+socket);
-    console.log("remove_peer room:"+room);
+	console.log("用户离开房间："+socket+"<>"+room);
     var flag = await dbUtil.deleteRoomUser(socket,room);
     if (flag){
         logger.info(socket + "用户离开房间"+room+"成功");

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>really peer connection</title>
+    <link rel="stylesheet" href="/dist/css/main.css">
+    <script type="text/javascript" src="/dist/js/jquery.js"></script>
+    <script language="javascript" type="text/javascript">
+        function createRoomUser(){
+            var video = $("#video")[0].checked;
+            var audio = $("#audio")[0].checked;
+            var userid = $("#userid").val();
+            var roomid = $("#roomid").val();
+            var token = $("#token").val();
+            if (!userid){
+                alert("用户id未传！");
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: '/webrtcCreateUserCode',
+                contentType: "application/json",
+                data:JSON.stringify({
+                    "video": video,
+                    "audio": audio,
+                    "room": roomid,
+                    "token": token,
+                    "user": userid
+                }),
+                success: function (result) {
+                    if (result.code == 200) {
+                        $("#par").val(result.result);
+                    }else {
+                        alert(result.msg == null ? result.message:result.msg);
+                    }
+                }
+            });
+        }
+    </script>
+
+</head>
+<body>
+<table align="center">
+    <tr><td>
+        <form action="/webrtcJoinRoom" method="post">
+            用户id: <input type="text" name="userid" id="userid"><br>
+            房间号: <input type="text" name="roomid" id="roomid"><br>
+            验证码: <input type="text" name="token" id="token"><br>
+            音频: <input type="checkbox" name="video" id="video" checked>
+            视频: <input type="checkbox" name="audio" id="audio" checked><br>
+            加入房间参数: <input type="text" name="par" id="par" readonly value=""><br>
+            <input type="button" onclick="createRoomUser()" value="生成房间参数"><br>
+            <input type="submit" value="加入房间">
+        </form>
+    </td></tr>
+
+</table>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建房间</title>
+    <link rel="stylesheet" href="/dist/css/main.css">
+    <script type="text/javascript" src="/dist/js/jquery.js"></script>
+    <script language="javascript" type="text/javascript">
+        function createRoom(){
+            let userid = $("#userid").val();
+            if (!userid){
+                alert("用户id未传！");
+                return;
+            }
+            let users = userid.split(",");
+            $.ajax({
+                type: "POST",
+                url: '/webrtcCreateRoom',
+                contentType: "application/json",
+                data:JSON.stringify({
+                    "users": users
+                }),
+                success: function (result) {
+                    if (result.code == 200) {
+                        $("#room").val(result.result.room);
+                        $("#token").val(result.result.token);
+                    }else {
+                        alert(result.msg == null ? result.message:result.msg);
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<table align="center">
+    <tr><td>
+        房间人员id: <input type="text" id="userid"><br>
+        房间号：<input type="text" id="room" readonly><br>
+        房间验证码：<input type="text" id="token" readonly><br>
+        <input type="button" onclick="createRoom()" value="创建房间">
+    </td></tr>
+
+</table>
+</body>
+</html>
